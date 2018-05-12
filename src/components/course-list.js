@@ -68,8 +68,7 @@ export class CourseList extends React.Component {
 
     async deleteClass(cd) {
         try {
-            await axios.post('http://localhost:8080/COURSES', {fileName: cd}).then(res => {
-                console.log(res);
+            await axios.post('http://localhost:8080/deleteCourse', {fileName: cd}).then(res => {
             }).catch(err => {
                 console.warn('AXIOS::DELETE_COURSES:ERR', err);
             });
