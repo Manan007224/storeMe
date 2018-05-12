@@ -1,18 +1,39 @@
 import React from "react";
 import _ from 'lodash';
+import axios from 'axios';
 import {CourseItem} from "./courses";
 
 export class CourseList extends React.Component {
+
+    constructor(props) {
+        super(props);
+        this.state = {Courses: []};
+    }
+
+    componentWillMount() {
+        console.log('Compoents for COURSE-LIST WILL MOUNT NOW');
+        axios.get('http://localhost:8080/COURSES').then(res => {
+            console.log(res.data.files);
+            this.setState({Courses: res.data.files});
+        });
+    }
+
+    showCourseHandler() {
+        axios.get('http://localhost:8080/COURSES').then(res => {
+            console.log(res.data.files);
+            return res.data.files;
+        });
+    }
+
     passProps() {
-        const props = this.props;
-        return _.map(this.props.Courses, (Course, index) => <CourseItem key={index} {...Course} {...props}/>);
+       
     }
     
     render() {
         return (
             <table>
                 <div> Now Displaying the courses </div>
-                <tbody> {this.passProps()} </tbody>
+                <CourseItem Courses={this.state.Courses} />
             </table>
         );
     }
