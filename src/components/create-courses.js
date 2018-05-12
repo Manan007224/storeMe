@@ -10,8 +10,8 @@ export class CreateCourse extends React.Component {
         );
     }
 
-    async handleSubmit(event) {
+    handleSubmit(event) {
         event.preventDefault();
-        await this.props.createClass(this.refs.createClass.value);
+        this.props.deleteClass(this.refs.createClass.value);
     }
 }

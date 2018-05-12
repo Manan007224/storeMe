@@ -19,11 +19,11 @@ const router = express.Router();
 
 // MiddleWare function add acess Cross control origin
 
-app.use(function(req, res, next) {
-	res.header("Access-Control-Allow-Origin", "*");
-	res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-	next();
-});
+// app.use(function(req, res, next) {
+// 	res.header("Access-Control-Allow-Origin", "*");
+// 	res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+// 	next();
+// });
   
 
 // Adding all the basic routes here for the Basic COURSE WEB-PAGE
@@ -112,21 +112,24 @@ app.post('/COURSES', async function(req, res, next) {
 
 // Route - Delete an existing course from the MAIN COURSE folder
 // WorkAround - None
-app.delete('/COURSES', async function(req, res, next){
+
+app.post('/deleteCourse', async function(req, res, next){
 	try {
 		let to_delete = req.body.fileName;
 		let delete_path = '/COURSES/' + to_delete;
+		console.log('DELETE_PATH', delete_path);
 		await dbx.filesDeleteV2({path: delete_path})
 			.then((response) => {
 				console.log(response);
 				res.status(200).json({result: 'File Delete Operation Completed Succesfully'});
 			})
 			.catch((err) => {
+				console.log(err);
 				res.status(err.status).json({error: {summary: err.error.error_summary, statusText: err.response.statusText}});
 			});
 	}
 	catch(err) {
-		res.status(409).json({error: 'This course with this id doesn\'t exitst'});
+		res.status(409).json({error: 'This course with this id doesn\'t exist'});
 	}
 });
 
@@ -211,7 +214,7 @@ app.post('/COURSES/:id', async function(req, res, next) {
 app.delete('/COURSES/:id', async function(req, res, next){
 	try {
 		let _id = req.params.id;
-		let to_delete = req.body.fileName;
+		let to_delete = req.body.params.fileName;
 		let delete_path = '/COURSES/' + _id + '/' + to_delete;
 		await dbx.filesDeleteV2({path: delete_path})
 			.then((response) => {
