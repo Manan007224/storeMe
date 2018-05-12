@@ -33,8 +33,7 @@ class App extends Component {
   render() {
     return (
       <div>
-        <CourseList
-        />
+        <CourseList/>
       </div>
     );
   }

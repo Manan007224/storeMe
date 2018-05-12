@@ -94,6 +94,7 @@ app.post('/COURSES', async function(req, res, next) {
 	try {
 		let to_upload = req.body.fileName;
 		let upload_path = '/COURSES/' + to_upload;
+		console.log(upload_path);
 		await dbx.filesCreateFolderV2({path: upload_path})
 			.then((response) => {
 				res.status(200).json({result: 'File Upload Operation Completed Succesfully'});

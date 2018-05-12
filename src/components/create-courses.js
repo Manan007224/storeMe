@@ -1,5 +1,5 @@
 import React from "react";
-
+import axios from "axios";
 export class CreateCourse extends React.Component {
     render() {
         return (
@@ -10,9 +10,8 @@ export class CreateCourse extends React.Component {
         );
     }
 
-    handleSubmit(event) {
-        event.preventDefault();;
-        this.props.createCourse(this.refs.createClass.value);
+    async handleSubmit(event) {
+        event.preventDefault();
+        await this.props.createClass(this.refs.createClass.value);
     }
-
 }
