@@ -1,8 +1,10 @@
+'use strict';
 const fs = require('fs');
 const request_promise = require('request-promise');
 require('isomorphic-fetch');
 const request = require('request');
 const http = require('http');
+const cors = require('cors');
 const crypto = require('crypto');
 const Dropbox = require('dropbox').Dropbox;
 const express = require('express');
@@ -12,7 +14,17 @@ const dbx = new Dropbox({accessToken: process.env.ACCESS_TOKEN});
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(cors());
 const router = express.Router();
+
+// MiddleWare function add acess Cross control origin
+
+app.use(function(req, res, next) {
+	res.header("Access-Control-Allow-Origin", "*");
+	res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+	next();
+});
+  
 
 // Adding all the basic routes here for the Basic COURSE WEB-PAGE
 
@@ -122,21 +134,24 @@ app.delete('/COURSES', async function(req, res, next){
 
 app.get('/COURSES', async function(req, res, next) {
 	try {
-		args = {path: '/COURSES', recursive: false, include_deleted: false, limit: 100};
+		let args = {path: '/COURSES', recursive: false, include_deleted: false, limit: 100};
 		let all_files = [];
 		await dbx.filesListFolder(args)
 			.then((response) => {
 				response.entries.forEach((file) => {
 					all_files.push(file.name);
 				});
+				console.log('REACHED HERE');
 				let metadata = {files: all_files};
-				res.status(200).json(metadata);
+				res.json(metadata);
+				//res.end(metadata);
 			})
 			.catch((err) => {
 				res.status(err.status).json({error: {summary: err.error.error_summary, statusText: err.response.statusText}});
 			});
 	}
 	catch(err) {
+		console.log(err);
 		res.status(409).json({error: 'This course with this id doesn\'t exitst'});
 	}
 });
