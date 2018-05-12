@@ -33,17 +33,25 @@ export class CourseList extends React.Component {
         try {
             console.log('REACHED THIS FUNCTION');
             await axios.post('http://localhost:8080/COURSES', {fileName: cl}).then(res => {
-                console.log(res);
-            })
+                if(res.data.err) {
+                    console.warn(err);
+                }
+            }).catch(err =>{
+                console.warn('ADD_COURSES::ERR', err);
+            });
             let new_class = [];
             await axios.get('http://localhost:8080/COURSES').then(res => {
-                new_class = res.data.files;
-                console.log(new_class);
+               if(res.data.err) {
+                   console.warn(err);
+               }
+               else new_class = res.data.files;
+            }).catch(err =>{
+                console.warn('GET_COURSES::ERR', err);
             });
             this.setState({Courses: new_class});
         }
         catch(err) {
-            console.log(err);
+            console.warn('creatClass:ERR', err);
         }
     }
 }
