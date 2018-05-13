@@ -12,6 +12,6 @@ export class CreateCourse extends React.Component {
 
     handleSubmit(event) {
         event.preventDefault();
-        this.props.deleteClass(this.refs.createClass.value);
+        this.props.addClass(this.refs.createClass.value);
     }
 }

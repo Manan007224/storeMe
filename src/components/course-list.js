@@ -9,6 +9,10 @@ export class CourseList extends React.Component {
     constructor(props) {
         super(props);
         this.state = {Courses: []};
+        this.showClassesHandler = this.showClassesHandler.bind(this);
+        this.addClassesHandler = this.addClassesHandler.bind(this);
+        this.deleteClassesHandler = this.deleteClassesHandler.bind(this);
+        this.toggleClassesHandler = this.toggleClassesHandler.bind(this);
     }
 
     async showClassesHandler() {
@@ -26,25 +30,7 @@ export class CourseList extends React.Component {
         return to_r;
     }
 
-    componentWillMount() {
-        axios.get('http://localhost:8080/COURSES').then(res => {
-            console.log(res.data.files);
-            this.setState({Courses: res.data.files});
-        });
-    }
-    
-    render() {
-        return (
-            <table>
-                <div> Now Displaying the courses </div>
-                <div> Create Class Mechanism </div>
-                <CreateCourse deleteClass={this.deleteClass.bind(this)}/>
-                <CourseItem Courses={this.state.Courses} />
-            </table>
-        );
-    }
-
-    async createClass(cl) {
+    async addClassesHandler(cl) {
         try {
             await axios.post('http://localhost:8080/COURSES', {fileName: cl}).then(res => {
                 if(res.data.err) {
@@ -66,7 +52,8 @@ export class CourseList extends React.Component {
         }
     }
 
-    async deleteClass(cd) {
+
+    async deleteClassesHandler(cd) {
         try {
             await axios.post('http://localhost:8080/deleteCourse', {fileName: cd}).then(res => {
             }).catch(err => {
@@ -83,5 +70,30 @@ export class CourseList extends React.Component {
         catch(err) {
             console.warn('deleteTask::ERR', err);
         }
+    }
+
+    toggleClassesHandler(toggleClass) {
+        console.log(toggleClass);
+    }
+
+    componentWillMount() {
+        axios.get('http://localhost:8080/COURSES').then(res => {
+            console.log(res.data.files);
+            this.setState({Courses: res.data.files});
+        });
+    }
+    
+    render() {
+        return (
+            <table>
+                <div> Now Displaying the courses </div>
+                <CreateCourse addClass={this.addClassesHandler}/>
+                <CourseItem 
+                    Courses={this.state.Courses} 
+                    deleteClass={this.deleteClassesHandler}
+                    toggleClass={this.toggleClassesHandler}
+                />
+            </table>
+        );
     }
 }
