@@ -3,12 +3,13 @@ import _ from 'lodash';
 import axios from 'axios';
 import {CourseItem} from "./courses";
 import {CreateCourse} from "./create-courses";
+import {FilesList} from "./files-list";
 
 export class CourseList extends React.Component {
 
     constructor(props) {
         super(props);
-        this.state = {Courses: [], development: false};
+        this.state = {Courses: [], development: true, activeClass: ''};
         this.showClassesHandler = this.showClassesHandler.bind(this);
         this.addClassesHandler = this.addClassesHandler.bind(this);
         this.deleteClassesHandler = this.deleteClassesHandler.bind(this);
@@ -73,38 +74,70 @@ export class CourseList extends React.Component {
         }
     }
 
-    toggleClassesHandler(toggleClass) {
-        console.log(toggleClass);
+    pp() {
+        console.log(this.state);
     }
 
+    async toggleClassesHandler(toggleClass) {
+        try {
+            await this.setState({development: false, activeClass: toggleClass});
+            this.pp();
+        }
+        catch(err) {
+            console.warn("toggleClassHandler:ERR", err);
+        }
+    }
+
+    renderCourseList() {
+        if(this.state.development === true) {
+            return (
+                <div className="container">
+                    <div className="row">
+                        <div className="col-lg-6 col-lg-offset-6">
+                            <CreateCourse
+                                addClass={this.addClassesHandler}
+                            />
+                        </div>
+                    </div>
+                    <div className="row">
+                        <div className="col-lg-8 col-lg-offset-4">
+                            <CourseItem 
+                                Courses={this.state.Courses} 
+                                deleteClass={this.deleteClassesHandler}
+                                toggleClass={this.toggleClassesHandler}
+                            />
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+        return (
+            <div className="container">
+                <div>
+                    <FilesList Course={this.state.activeClass} />
+                </div>
+            </div>    
+        );
+    }
 
     componentWillMount() {
         axios.get('http://localhost:8080/COURSES').then(res => {
-            console.log(res.data.files);
             this.setState({Courses: res.data.files});
         });
     }
     
+    componentWillUpdate(nextProp, nextState) {
+        console.log('Component is Updated');
+        console.log(nextProp);
+        console.log(nextState);
+    }
+
     render() {
         return (
-            <div class="container">
-                <div class="row">
-                    <div class="col-lg-6 col-lg-offset-6">
-                        <CreateCourse
-                            addClass={this.addClassesHandler}
-                        />
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-lg-8 col-lg-offset-4">
-                        <CourseItem 
-                            Courses={this.state.Courses} 
-                            deleteClass={this.deleteClassesHandler}
-                            toggleClass={this.toggleClassesHandler}
-                        />
-                     </div>
-                </div>
-            </div>      
+            <div>
+                {this.renderCourseList()}
+            </div>
         );
     }
+
 }
