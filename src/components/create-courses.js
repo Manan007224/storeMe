@@ -1,12 +1,16 @@
 import React from "react";
 import axios from "axios";
 export class CreateCourse extends React.Component {
+
     render() {
         return (
-            <form onSubmit={this.handleSubmit.bind(this)}>
-                <input type="text" placeholder="Add a new Course Here" ref="createClass" />
-                <button> Create </button>
-            </form>  
+
+            <form class="form-inline" onSubmit={this.handleSubmit.bind(this)}>
+                <div class="form-group">
+                    <input class="form-control" placeholder="Add a course Here" ref="createClass"/>
+                    <button type="submit" class="btn btn-default"> Create </button> 
+                </div>
+            </form>
         );
     }
 
@@ -15,3 +19,4 @@ export class CreateCourse extends React.Component {
         this.props.addClass(this.refs.createClass.value);
     }
 }
+

@@ -8,12 +8,13 @@ export class CourseList extends React.Component {
 
     constructor(props) {
         super(props);
-        this.state = {Courses: []};
+        this.state = {Courses: [], development: false};
         this.showClassesHandler = this.showClassesHandler.bind(this);
         this.addClassesHandler = this.addClassesHandler.bind(this);
         this.deleteClassesHandler = this.deleteClassesHandler.bind(this);
         this.toggleClassesHandler = this.toggleClassesHandler.bind(this);
     }
+
 
     async showClassesHandler() {
         let to_r = {};
@@ -76,6 +77,7 @@ export class CourseList extends React.Component {
         console.log(toggleClass);
     }
 
+
     componentWillMount() {
         axios.get('http://localhost:8080/COURSES').then(res => {
             console.log(res.data.files);
@@ -85,15 +87,24 @@ export class CourseList extends React.Component {
     
     render() {
         return (
-            <table>
-                <div> Now Displaying the courses </div>
-                <CreateCourse addClass={this.addClassesHandler}/>
-                <CourseItem 
-                    Courses={this.state.Courses} 
-                    deleteClass={this.deleteClassesHandler}
-                    toggleClass={this.toggleClassesHandler}
-                />
-            </table>
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-6 col-lg-offset-6">
+                        <CreateCourse
+                            addClass={this.addClassesHandler}
+                        />
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-8 col-lg-offset-4">
+                        <CourseItem 
+                            Courses={this.state.Courses} 
+                            deleteClass={this.deleteClassesHandler}
+                            toggleClass={this.toggleClassesHandler}
+                        />
+                     </div>
+                </div>
+            </div>      
         );
     }
 }
