@@ -19,11 +19,11 @@ const router = express.Router();
 
 // MiddleWare function add acess Cross control origin
 
-// app.use(function(req, res, next) {
-// 	res.header("Access-Control-Allow-Origin", "*");
-// 	res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-// 	next();
-// });
+app.use(function(req, res, next) {
+	res.header("Access-Control-Allow-Origin", "*");
+	res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+	next();
+});
   
 
 // Adding all the basic routes here for the Basic COURSE WEB-PAGE
@@ -46,7 +46,7 @@ app.get('/createCourses', async function(req, res, next){
 app.get('/COURSES/:id', async function(req, res, next) {
 	try {
 		let _id = req.params.id;
-		args = {
+		let args = {
 			path: '/COURSES/' + _id, 
 			include_media_info: true,
 			include_deleted: false,
@@ -61,6 +61,7 @@ app.get('/COURSES/:id', async function(req, res, next) {
 			});
 	}
 	catch(err) {
+		console.log(err);
 		res.status(409).json({error: 'This course with this id doesn\'t exitst'});
 	}
 });
@@ -72,8 +73,8 @@ app.post('/COURSES/:id', async function(req, res, next) {
 		let _courseID = req.params.id;
 		let to_upload = req.body.fileName;
 		let uplaod_path = '/COURSES/' + _courseID + '/' + to_upload;
-		let content = fs.readFileSync('./package.json');
-		args = {contents: content, path: uplaod_path, autorename: true, mute: false };
+		let content = fs.readFileSync(to_upload);
+		let args = {contents: content, path: uplaod_path, autorename: true, mute: false };
 		await dbx.filesUpload(args)
 			.then((response) => {
 				res.status(200).json({result: 'File Upload Operation Completed Succesfully'});
@@ -83,7 +84,8 @@ app.post('/COURSES/:id', async function(req, res, next) {
 			});
 	}
 	catch(err) {
-		res.status(409).json({error: 'This course with this id doesn\'t exitst'});
+		console.log(err);
+		res.status(409).json({error: 'This course with this id doesn\'t belong'});
 	}
 });
 
@@ -117,7 +119,6 @@ app.post('/deleteCourse', async function(req, res, next){
 	try {
 		let to_delete = req.body.fileName;
 		let delete_path = '/COURSES/' + to_delete;
-		console.log('DELETE_PATH', delete_path);
 		await dbx.filesDeleteV2({path: delete_path})
 			.then((response) => {
 				console.log(response);
@@ -211,10 +212,10 @@ app.post('/COURSES/:id', async function(req, res, next) {
 // Route - Delete a file(or a Folder) from a particular Course
 // WorkAround - Add a function(getFileMetadata) to check if the file is a zip then filesZipDeleteV2 will be performed
 
-app.delete('/COURSES/:id', async function(req, res, next){
+app.post('/COURSES/:id/deleteCourses', async function(req, res, next){
 	try {
 		let _id = req.params.id;
-		let to_delete = req.body.params.fileName;
+		let to_delete = req.body.fileName;
 		let delete_path = '/COURSES/' + _id + '/' + to_delete;
 		await dbx.filesDeleteV2({path: delete_path})
 			.then((response) => {
@@ -226,9 +227,36 @@ app.delete('/COURSES/:id', async function(req, res, next){
 			});
 	}
 	catch(err) {
+		console.log(err);
 		res.status(409).json({error: 'This course with this id doesn\'t exitst'});
 	}
 });
+
+// Route to download a course from a particular course FOLDER
+// WorkAround - Add a option for ZIP and TAR files, but later
+
+app.get('/COURSES/:id/:if', async function(req, res, next) {
+	try {
+		let to_download = '/COURSES/' + req.params.id + '/' + req.params.if;
+		let bytes = " ";
+		await dbx.filesDownload({path: to_download})
+			.then((response) => {
+				bytes = response.fileBinary;
+				fs.writeFile("test.txt", bytes, "binary", (err) => {
+					if(err) res.status(409).json({err: 'Problem related to uploading the file'});
+					else {
+						res.status(200).json({result: "Success in Downloading the File"});
+					}
+				});
+			})
+			.catch((err) =>{
+				res.status(409).json({err: 'Problem with dbx download file function'});
+			});
+	}
+	catch(err) {
+		console.log(err);
+	}
+})
 
 
 const port = process.env.PORT || 8080;
