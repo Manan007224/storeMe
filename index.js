@@ -43,28 +43,6 @@ app.get('/createCourses', async function(req, res, next){
 // Adding the routes for File Operations for a Particular Course
 // Check if the given 'id' entity is either a file, folder, media file, tar file or a zip file.
 
-app.get('/COURSES/:id', async function(req, res, next) {
-	try {
-		let _id = req.params.id;
-		let args = {
-			path: '/COURSES/' + _id, 
-			include_media_info: true,
-			include_deleted: false,
-			include_has_explicit_shared_members: true
-		}
-		await dbx.filesGetMetadata(args)
-			.then((response) =>{
-				res.status(200).json({result: 'Correct Page Entered'});
-			})
-			.catch((err) => {
-				res.status(err.status).json({error: {summary: err.error.error_summary, statusText: err.response.statusText}});
-			});
-	}
-	catch(err) {
-		console.log(err);
-		res.status(409).json({error: 'This course with this id doesn\'t exitst'});
-	}
-});
 
 // Adding the routes to Upload a certain file for the given id
 
@@ -77,6 +55,7 @@ app.post('/COURSES/:id', async function(req, res, next) {
 		let args = {contents: content, path: uplaod_path, autorename: true, mute: false };
 		await dbx.filesUpload(args)
 			.then((response) => {
+				console.log('SUCCESS');
 				res.status(200).json({result: 'File Upload Operation Completed Succesfully'});
 			})
 			.catch((err) => {
@@ -167,7 +146,7 @@ app.get('/COURSES', async function(req, res, next) {
 app.get('/COURSES/:id', async function(req, res, next) {
 	try {
 		let pth = '/COURSES/' + req.params.id;
-		args = {path: pth, recursive: false, include_deleted: false, limit: 100};
+		let args = {path: pth, recursive: false, include_deleted: false, limit: 100};
 		let all_files = [];
 		await dbx.filesListFolder(args)
 			.then((response) => {
@@ -175,31 +154,10 @@ app.get('/COURSES/:id', async function(req, res, next) {
 					all_files.push(file.name);
 				});
 				let metadata = {files: all_files};
+				console.log(metadata);
 				res.status(200).json(metadata);
 			})
 			.catch((err) => {
-				res.status(err.status).json({error: {summary: err.error.error_summary, statusText: err.response.statusText}});
-			});
-	}
-	catch(err) {
-		res.status(409).json({error: 'This course with this id doesn\'t exitst'});
-	}
-});
-
-// Route - Upload a file(or a Folder) from a particular Course
-// WorkAround - Add a function(getFileMetadata) to check if the file is a zip then filesZipUploadV2 will be performed
-
-app.post('/COURSES/:id', async function(req, res, next) {
-	try {
-		let _id = req.params.id;
-		let to_upload = req.body.fileName;
-		let upload_path = '/COURSES/' + _id + '/' + to_upload;
-		await dbx.filesCreateFolderV2({path: upload_path})
-			.then((response) => {
-				res.status(200).json({result: 'File Upload Operation Completed Succesfully'});
-			})
-			.catch((err) => {
-				console.log(err);
 				res.status(err.status).json({error: {summary: err.error.error_summary, statusText: err.response.statusText}});
 			});
 	}
@@ -208,6 +166,31 @@ app.post('/COURSES/:id', async function(req, res, next) {
 		res.status(409).json({error: 'This course with this id doesn\'t exitst'});
 	}
 });
+
+// Route - Upload a file(or a Folder) from a particular Course
+// WorkAround - Add a function(getFileMetadata) to check if the file is a zip then filesZipUploadV2 will be performed
+
+// app.post('/COURSES/:id', async function(req, res, next) {
+// 	try {
+// 		console.log("REACHED THIS ROUTE");
+// 		let _id = req.params.id;
+// 		let to_upload = req.body.fileName;
+// 		let upload_path = '/COURSES/' + _id + '/' + to_upload;
+// 		await dbx.filesCreateFolderV2({path: upload_path})
+// 			.then((response) => {
+// 				res.status(200).json({result: 'File Upload Operation Completed Succesfully'});
+// 			})
+// 			.catch((err) => {
+// 				console.log(err);
+// 				res.status(err.status).json({error: {summary: err.error.error_summary, statusText: err.response.statusText}});
+// 			});
+// 	}
+// 	catch(err) {
+// 		console.log("REACHED THIS ROUTET");
+// 		console.log(err);
+// 		res.status(409).json({error: 'This course with this id doesn\'t exitst'});
+// 	}
+// });
 
 // Route - Delete a file(or a Folder) from a particular Course
 // WorkAround - Add a function(getFileMetadata) to check if the file is a zip then filesZipDeleteV2 will be performed

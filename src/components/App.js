@@ -8,7 +8,7 @@ class App extends Component {
 
   render() {
     return (
-      <div class="jumbotron">
+      <div className="jumbotron">
         <h1> Course Data Manager </h1>
         <CourseList/>
       </div>
