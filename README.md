@@ -4,12 +4,17 @@
 
 API calls:
 
-`/createCourses`
+`/createCourses` **(POST)**
+Create new course
 
-`/COURSES/:id`
 
-`/COURSES`
+`/COURSES/:id` **(GET, POST)**
+Get meta information for course with `:id`
 
-`/deleteCourse`
 
-`/COURSES/:id/deleteCourses`
+`/COURSES` **(GET, POST)**
+Get list of all courses
+
+
+`/COURSES/:id/deleteCourses` **(POST)**
+Delete course with `:id`
